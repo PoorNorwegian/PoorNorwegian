@@ -160,26 +160,30 @@ box-shadow: 0 0 40px rgba(0,196,140,0.3);
 touch-action: none;
 }
 
-/* Mobile controls */
+/* Mobile controls - bedre spacing */
 .controls {
 display: none;
-grid-template-columns: repeat(3, 60px);
-gap: 10px;
+grid-template-columns: repeat(3, 70px);
+gap: 18px; /* Økt avstand mellom knappene */
 justify-content: center;
-margin: 20px auto;
+margin: 30px auto 20px;
 }
 .controls button {
 background: rgba(0,196,140,0.2);
 color: var(--accent);
 border: 2px solid var(--accent);
-border-radius: 12px;
-font-size: 1.8rem;
-height: 60px;
-width: 60px;
+border-radius: 14px;
+font-size: 2rem;
+height: 70px;
+width: 70px;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 .controls button:active {
 background: var(--accent);
 color: #0a0f0c;
+transform: scale(0.95);
 }
 
 /* LEADERBOARD */
@@ -219,7 +223,7 @@ background: rgba(0,196,140,0.1);
 @media (max-width: 768px) {
 .hero-content h1 { font-size: 3.8rem; }
 h2 { font-size: 2.6rem; }
-#game { width: 100%; max-width: 380px; height: auto; }
+#game { width: 100%; max-width: 400px; height: auto; }
 .controls { display: grid; }
 }
 </style>
@@ -303,17 +307,18 @@ COMING SOON — 12 APRIL
 <canvas id="game" width="600" height="600"></canvas>
 </div>
 
-<!-- Mobile controls -->
+<!-- Mobile controls med bedre spacing -->
 <div class="controls">
 <div></div>
 <button id="up">↑</button>
 <div></div>
+
 <button id="left">←</button>
 <button id="down">↓</button>
 <button id="right">→</button>
 </div>
 
-<p style="margin:20px 0 10px; font-size:1.2rem;">
+<p style="margin:25px 0 10px; font-size:1.2rem;">
 Score: <span id="score">0</span> &nbsp;&nbsp;&nbsp;
 High Score: <span id="highscore">0</span>
 </p>
@@ -465,7 +470,7 @@ else if (diffY < -30 && dy !== -box) { dx = 0; dy = box; }
 }
 });
 
-// Virtual buttons for mobile
+// Virtual buttons
 document.getElementById("up").addEventListener("click", () => { if (gameRunning && dy !== box) { dx = 0; dy = -box; }});
 document.getElementById("down").addEventListener("click", () => { if (gameRunning && dy !== -box) { dx = 0; dy = box; }});
 document.getElementById("left").addEventListener("click", () => { if (gameRunning && dx !== box) { dx = -box; dy = 0; }});
