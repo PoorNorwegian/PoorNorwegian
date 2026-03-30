@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <title>PoorNorwegian (PORN)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -330,21 +331,14 @@ Use arrow keys or swipe on mobile • Eat the kroner!
 
 <!-- LEADERBOARD -->
 <div class="section" id="leaderboard">
-<h2>🏆 Leaderboard – Top Scores</h2>
-<table id="lbTable">
-<thead>
-<tr>
-<th>Rank</th>
-<th>Wallet / Signature</th>
-<th>Score</th>
-</tr>
-</thead>
-<tbody id="lbBody"></tbody>
-</table>
-<p style="text-align:center; margin-top:25px; opacity:0.75; font-size:0.95rem;">
-Scores are saved locally in your browser.<br>
-Enter your wallet address after game over to appear on the leaderboard.
-</p>
+  <h2>🏆 Leaderboard - Top Scores</h2>
+  <div id="leaderboardContainer" style="background:#111; padding:15px; border-radius:8px; color:#0f0; font-family:monospace; min-height:200px;">
+    Loading scores from Supabase...
+  </div>
+  <p style="text-align:center; margin-top:15px; color:#888; font-size:14px;">
+    Scores are now saved publicly.<br>
+    Enter your wallet address after game over to appear on the leaderboard.
+  </p>
 </div>
 
 <script>
@@ -418,28 +412,31 @@ move();
 draw();
 }
 
-function startGame() {
-if (gameInterval) clearInterval(gameInterval);
-initGame();
-draw();
-gameInterval = setInterval(gameLoop, 110);
-}
-
 function gameOver() {
-gameRunning = false;
-clearInterval(gameInterval);
+  gameRunning = false;
+  clearInterval(gameInterval);
 
-const currentHigh = parseInt(localStorage.getItem("highscore") || "0");
-if (score > currentHigh) localStorage.setItem("highscore", score);
-document.getElementById("highscore").textContent = localStorage.getItem("highscore") || 0;
+  // Keep old local highscore
+  const currentHigh = parseInt(localStorage.getItem("highscore")) || "0";
+  if (score > currentHigh) localStorage.setItem("highscore", score);
+  if (document.getElementById("highscore")) {
+    document.getElementById("highscore").textContent = localStorage.getItem("highscore");
+  }
 
-const wallet = prompt(`Game Over!\n\nYou scored ${score} points!\n\nEnter your wallet address as signature:`);
-if (wallet && wallet.trim()) saveScore(wallet.trim(), score);
+  // Save to public Supabase leaderboard
+  submitScorePrompt(score);
 
-alert(`Game Over! You scored ${score} points 🐍`);
+  alert(`Game Over! You scored ${score} points 🎉`);
 }
 
-// Keyboard controls
+// Ask for wallet and save to Supabase
+async function submitScorePrompt(finalScore) {
+  const wallet = prompt(`Game Over!\n\nYou scored ${finalScore} points!\n\nEnter your wallet address to save on the public leaderboard:`);
+  
+  if (wallet && wallet.trim()) {
+    await submitScore(wallet.trim(), finalScore);
+  }
+}
 document.addEventListener("keydown", e => {
 if (!gameRunning) return;
 if (e.key === "ArrowLeft" && dx !== box) { dx = -box; dy = 0; }
@@ -509,4 +506,87 @@ document.getElementById("highscore").textContent = localStorage.getItem("highsco
 renderLeaderboard();
 </script>
 </body>
+<script>
+// ==================== SUPABASE SETUP ====================
+const SUPABASE_URL = 'https://bbcyuqwxxrdtwptemolt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP';
+
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ==================== LOAD LEADERBOARD ====================
+async function loadLeaderboard() {
+  try {
+    const { data, error } = await supabase
+      .from('leaderboard')
+      .select('wallet, score')
+      .order('score', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    const container = document.getElementById('leaderboard');
+    if (!container) {
+      console.log('Leaderboard container not found');
+      return;
+    }
+
+    container.innerHTML = '';
+
+    data.forEach((entry, index) => {
+      const shortWallet = entry.wallet.substring(0, 6) + '...' + entry.wallet.substring(entry.wallet.length - 4);
+      
+      const row = document.createElement('div');
+      row.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333;';
+      row.innerHTML = `
+        <span><strong>${index + 1}.</strong></span>
+        <span>${shortWallet}</span>
+        <span><strong>${entry.score}</strong></span>
+      `;
+      container.appendChild(row);
+    });
+
+  } catch (err) {
+    console.error('Error loading leaderboard:', err);
+  }
+}
+
+// ==================== SUBMIT SCORE ====================
+async function submitScore(walletAddress, score) {
+  if (!walletAddress) {
+    alert("Please enter your wallet address");
+    return false;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('leaderboard')
+      .insert([{ 
+        wallet: walletAddress.trim(), 
+        score: parseInt(score) 
+      }]);
+
+    if (error) throw error;
+
+    alert(`✅ Score of ${score} saved!`);
+    await loadLeaderboard();
+    return true;
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save score: " + err.message);
+    return false;
+  }
+}
+
+// ==================== CALL THIS WHEN GAME ENDS ====================
+async function gameOver(finalScore) {
+  const wallet = prompt("Enter your wallet address to save your score:");
+  if (wallet) {
+    await submitScore(wallet, finalScore);
+  }
+}
+
+// Load leaderboard when page opens
+document.addEventListener('DOMContentLoaded', loadLeaderboard);
+</script>
 </html>
