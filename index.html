@@ -6,47 +6,14 @@
 <title>Snake - Public Leaderboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body {
-margin: 0;
-background: #0a0a0a;
-color: #0f0;
-font-family: monospace;
-text-align: center;
-}
-canvas {
-background: #111;
-border: 4px solid #0f0;
-margin: 20px auto;
-display: block;
-}
-#leaderboard {
-max-width: 600px;
-margin: 20px auto;
-background: #111;
-padding: 15px;
-border-radius: 10px;
-border: 2px solid #0f0;
-}
-table {
-width: 100%;
-border-collapse: collapse;
-}
-th, td {
-padding: 10px;
-border-bottom: 1px solid #333;
-}
-th { color: #0f0; }
-h1 { margin: 15px 0; color: #0f0; }
-button {
-padding: 10px 20px;
-font-size: 18px;
-background: #0f0;
-color: #000;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-margin: 10px;
-}
+body { margin:0; background:#0a0a0a; color:#0f0; font-family:monospace; text-align:center; }
+canvas { background:#111; border:4px solid #0f0; margin:20px auto; display:block; }
+#leaderboard { max-width:600px; margin:20px auto; background:#111; padding:15px; border-radius:10px; border:2px solid #0f0; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:10px; border-bottom:1px solid #333; }
+th { color:#0f0; }
+button { padding:12px 25px; font-size:18px; background:#0f0; color:#000; border:none; border-radius:6px; cursor:pointer; margin:10px; }
+h1 { margin:15px 0; }
 </style>
 </head>
 <body>
@@ -56,9 +23,7 @@ margin: 10px;
 <div id="leaderboard">
 <h2>🏆 Top 10 Scores</h2>
 <table>
-<thead>
-<tr><th>Rank</th><th>Wallet</th><th>Score</th></tr>
-</thead>
+<thead><tr><th>Rank</th><th>Wallet</th><th>Score</th></tr></thead>
 <tbody id="lbBody"></tbody>
 </table>
 </div>
@@ -66,21 +31,26 @@ margin: 10px;
 <button onclick="startGame()">New Game</button>
 
 <script>
-// Supabase setup
-const SUPABASE_URL = 'https://bbcyuqwxxrdtwptemolt.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP';
-const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase
+const supabase = Supabase.createClient(
+'https://bbcyuqwxxrdtwptemolt.supabase.co',
+'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP'
+);
 
-// Snake game variables
+// Snake variables
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const box = 25;
-let snake, food, dx, dy, score, gameRunning, gameInterval;
+let snake = [];
+let food = {};
+let dx = box, dy = 0;
+let score = 0;
+let gameRunning = true;
+let gameInterval;
 
 function initGame() {
-snake = [{ x: 200, y: 200 }];
-dx = box;
-dy = 0;
+snake = [{x: 200, y: 200}];
+dx = box; dy = 0;
 score = 0;
 gameRunning = true;
 generateFood();
@@ -88,8 +58,8 @@ generateFood();
 
 function generateFood() {
 food = {
-x: Math.floor(Math.random() * (canvas.width / box)) * box,
-y: Math.floor(Math.random() * (canvas.height / box)) * box
+x: Math.floor(Math.random() * 16) * box,
+y: Math.floor(Math.random() * 16) * box
 };
 }
 
@@ -97,11 +67,9 @@ function draw() {
 ctx.fillStyle = "#111";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// Draw snake
 ctx.fillStyle = "#0f0";
-snake.forEach(part => ctx.fillRect(part.x, part.y, box, box));
+snake.forEach(s => ctx.fillRect(s.x, s.y, box, box));
 
-// Draw food
 ctx.fillStyle = "#f00";
 ctx.fillRect(food.x, food.y, box, box);
 }
@@ -111,9 +79,9 @@ if (!gameRunning) return;
 
 const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-// Collision with wall or self
+// Collision
 if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
-snake.some(part => part.x === head.x && part.y === head.y)) {
+snake.some(s => s.x === head.x && s.y === head.y)) {
 endGame();
 return;
 }
@@ -134,46 +102,26 @@ function endGame() {
 gameRunning = false;
 clearInterval(gameInterval);
 
-const wallet = prompt(`Game Over!\n\nYou scored ${score} points!\n\nEnter your wallet address to save on leaderboard:`);
+const wallet = prompt(`Game Over!\n\nYou scored ${score} points!\n\nEnter wallet address:`);
 if (wallet && wallet.trim()) {
-saveScore(wallet.trim(), score);
-} else {
-alert(`Game Over! Final score: ${score}`);
+supabase.from('leaderboard').insert([{ wallet: wallet.trim(), score: score }])
+.then(() => loadLeaderboard());
 }
-}
-
-async function saveScore(wallet, score) {
-const { error } = await supabase
-.from('leaderboard')
-.insert([{ wallet: wallet, score: parseInt(score) }]);
-
-if (error) console.error("Save error:", error);
-loadLeaderboard();
+alert(`Game Over! Score: ${score}`);
 }
 
 async function loadLeaderboard() {
-const { data, error } = await supabase
+const { data } = await supabase
 .from('leaderboard')
 .select('wallet, score')
 .order('score', { ascending: false })
 .limit(10);
 
-if (error) {
-console.error(error);
-return;
-}
-
 const tbody = document.getElementById("lbBody");
 tbody.innerHTML = "";
-
-data.forEach((entry, index) => {
-const shortWallet = entry.wallet.substring(0, 6) + "..." + entry.wallet.substring(entry.wallet.length - 4);
-tbody.innerHTML += `
-<tr>
-<td>${index + 1}</td>
-<td>${shortWallet}</td>
-<td><strong>${entry.score}</strong></td>
-</tr>`;
+data.forEach((row, i) => {
+const short = row.wallet.substring(0,6) + "..." + row.wallet.slice(-4);
+tbody.innerHTML += `<tr><td>${i+1}</td><td>${short}</td><td>${row.score}</td></tr>`;
 });
 }
 
@@ -190,10 +138,10 @@ function startGame() {
 initGame();
 draw();
 if (gameInterval) clearInterval(gameInterval);
-gameInterval = setInterval(move, 110);
+gameInterval = setInterval(move, 120);
 }
 
-// Initialize
+// Start
 window.onload = () => {
 startGame();
 loadLeaderboard();
