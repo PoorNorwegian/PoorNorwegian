@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>PoorNorwegian (PORN)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
@@ -11,8 +11,6 @@
 --bg: #0a0f0c;
 --card: #111815;
 --accent: #00c48c;
---accent-dark: #00a675;
---gold: #d4af37;
 --text: #e0f2e9;
 --text-light: #a3c4b8;
 }
@@ -23,7 +21,6 @@ font-family: 'Inter', sans-serif;
 color: var(--text);
 background: var(--bg);
 line-height: 1.7;
-overflow-x: hidden;
 }
 
 h1, h2 {
@@ -109,7 +106,6 @@ margin-bottom: 40px;
 text-align: center;
 }
 
-/* CONTENT BOXES */
 .content-box {
 background: var(--card);
 border: 1px solid rgba(0,196,140,0.2);
@@ -151,13 +147,39 @@ margin: 0 0 12px 0;
 }
 
 /* SNAKE GAME */
-#game {
-display: block;
+#game-container {
+display: inline-block;
+position: relative;
 margin: 30px auto;
+}
+#game {
 background: #0a0f0c;
 border: 6px solid var(--accent);
 border-radius: 16px;
-box-shadow: 0 0 40px rgba(0,196,140,0.25);
+box-shadow: 0 0 40px rgba(0,196,140,0.3);
+touch-action: none;
+}
+
+/* Mobile controls */
+.controls {
+display: none;
+grid-template-columns: repeat(3, 60px);
+gap: 10px;
+justify-content: center;
+margin: 20px auto;
+}
+.controls button {
+background: rgba(0,196,140,0.2);
+color: var(--accent);
+border: 2px solid var(--accent);
+border-radius: 12px;
+font-size: 1.8rem;
+height: 60px;
+width: 60px;
+}
+.controls button:active {
+background: var(--accent);
+color: #0a0f0c;
 }
 
 /* LEADERBOARD */
@@ -176,8 +198,7 @@ background: #0a0f0c;
 border-radius: 12px;
 overflow: hidden;
 }
-#leaderboard th,
-#leaderboard td {
+#leaderboard th, #leaderboard td {
 padding: 18px 25px;
 text-align: left;
 }
@@ -195,10 +216,11 @@ color: var(--accent);
 background: rgba(0,196,140,0.1);
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
 .hero-content h1 { font-size: 3.8rem; }
 h2 { font-size: 2.6rem; }
+#game { width: 100%; max-width: 380px; height: auto; }
+.controls { display: grid; }
 }
 </style>
 </head>
@@ -225,7 +247,7 @@ h2 { font-size: 2.6rem; }
 <div class="content-box">
 <p>PoorNorwegian (PORN) is a meme coin born from one simple truth: <strong>Living in Norway is expensive.</strong></p>
 <p>We work hard, we earn well — and then the state takes its share. 30% income tax. 25% VAT on almost everything. High prices on fuel, food, and living costs.</p>
-<p>PoorNorwegian (PORN) is satire, rebellion, and creativity wrapped into one community-driven token. It represents the everyday Norwegian who feels squeezed by taxes and rising costs — and who starts looking for alternative ways to build wealth.</p>
+<p>PoorNorwegian (PORN) is satire, rebellion, and creativity wrapped into one community-driven token. It represents the everyday Norwegian who feels squeezed by taxes — and who starts looking for alternative ways to build wealth.</p>
 <p><strong>PORN is not just a joke about being “poor in Norway.” It’s a symbol of financial creativity in a high-tax society.</strong></p>
 </div>
 </div>
@@ -276,14 +298,28 @@ COMING SOON — 12 APRIL
 <!-- SNAKE GAME -->
 <div class="section">
 <h2>🎮 Snake – PoorNorwegian Edition</h2>
-<canvas id="game" width="440" height="440"></canvas>
+
+<div id="game-container">
+<canvas id="game" width="600" height="600"></canvas>
+</div>
+
+<!-- Mobile controls -->
+<div class="controls">
+<div></div>
+<button id="up">↑</button>
+<div></div>
+<button id="left">←</button>
+<button id="down">↓</button>
+<button id="right">→</button>
+</div>
+
 <p style="margin:20px 0 10px; font-size:1.2rem;">
 Score: <span id="score">0</span> &nbsp;&nbsp;&nbsp;
 High Score: <span id="highscore">0</span>
 </p>
 <button class="btn" onclick="startGame()" style="font-size:1.1rem; padding:14px 36px;">START GAME</button>
 <p style="font-size:1rem; opacity:0.75; margin-top:15px;">
-Use arrow keys • Eat the Norwegian kroner!
+Use arrow keys or swipe on mobile • Eat the kroner!
 </p>
 </div>
 
@@ -310,7 +346,9 @@ Enter your wallet address after game over to appear on the leaderboard.
 // ==================== SNAKE GAME ====================
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-const box = 22;
+let box = 25;
+let cols = canvas.width / box;
+let rows = canvas.height / box;
 
 let snake = [];
 let food = {};
@@ -319,10 +357,12 @@ let dy = 0;
 let score = 0;
 let gameInterval = null;
 let gameRunning = false;
+let lastTouchX = 0;
+let lastTouchY = 0;
 
 function initGame() {
 snake = [{ x: 10 * box, y: 10 * box }];
-food = { x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box };
+food = { x: Math.floor(Math.random() * (cols-2) + 1) * box, y: Math.floor(Math.random() * (rows-2) + 1) * box };
 dx = box; dy = 0; score = 0;
 document.getElementById("score").textContent = score;
 gameRunning = true;
@@ -342,16 +382,17 @@ ctx.strokeRect(snake[i].x, snake[i].y, box, box);
 ctx.fillStyle = "#d4af37";
 ctx.fillRect(food.x, food.y, box, box);
 ctx.fillStyle = "#0a0f0c";
-ctx.font = "bold 14px Inter";
+ctx.font = "bold 16px Inter";
 ctx.textAlign = "center";
-ctx.fillText("kr", food.x + box/2, food.y + 16);
+ctx.fillText("kr", food.x + box/2, food.y + 18);
 }
 
 function move() {
 if (!gameRunning) return;
 const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some(s => s.x === head.x && s.y === head.y)) {
+if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
+snake.some(s => s.x === head.x && s.y === head.y)) {
 gameOver();
 return;
 }
@@ -361,7 +402,7 @@ snake.unshift(head);
 if (head.x === food.x && head.y === food.y) {
 score += 10;
 document.getElementById("score").textContent = score;
-food = { x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box };
+food = { x: Math.floor(Math.random() * (cols-2) + 1) * box, y: Math.floor(Math.random() * (rows-2) + 1) * box };
 } else {
 snake.pop();
 }
@@ -376,7 +417,7 @@ function startGame() {
 if (gameInterval) clearInterval(gameInterval);
 initGame();
 draw();
-gameInterval = setInterval(gameLoop, 100);
+gameInterval = setInterval(gameLoop, 110);
 }
 
 function gameOver() {
@@ -393,6 +434,7 @@ if (wallet && wallet.trim()) saveScore(wallet.trim(), score);
 alert(`Game Over! You scored ${score} points 🐍`);
 }
 
+// Keyboard controls
 document.addEventListener("keydown", e => {
 if (!gameRunning) return;
 if (e.key === "ArrowLeft" && dx !== box) { dx = -box; dy = 0; }
@@ -400,6 +442,34 @@ if (e.key === "ArrowRight" && dx !== -box) { dx = box; dy = 0; }
 if (e.key === "ArrowUp" && dy !== box) { dx = 0; dy = -box; }
 if (e.key === "ArrowDown" && dy !== -box) { dx = 0; dy = box; }
 });
+
+// Touch swipe
+canvas.addEventListener("touchstart", e => {
+lastTouchX = e.changedTouches[0].screenX;
+lastTouchY = e.changedTouches[0].screenY;
+});
+
+canvas.addEventListener("touchend", e => {
+if (!gameRunning) return;
+let currentX = e.changedTouches[0].screenX;
+let currentY = e.changedTouches[0].screenY;
+let diffX = lastTouchX - currentX;
+let diffY = lastTouchY - currentY;
+
+if (Math.abs(diffX) > Math.abs(diffY)) {
+if (diffX > 30 && dx !== box) { dx = -box; dy = 0; }
+else if (diffX < -30 && dx !== -box) { dx = box; dy = 0; }
+} else {
+if (diffY > 30 && dy !== box) { dx = 0; dy = -box; }
+else if (diffY < -30 && dy !== -box) { dx = 0; dy = box; }
+}
+});
+
+// Virtual buttons for mobile
+document.getElementById("up").addEventListener("click", () => { if (gameRunning && dy !== box) { dx = 0; dy = -box; }});
+document.getElementById("down").addEventListener("click", () => { if (gameRunning && dy !== -box) { dx = 0; dy = box; }});
+document.getElementById("left").addEventListener("click", () => { if (gameRunning && dx !== box) { dx = -box; dy = 0; }});
+document.getElementById("right").addEventListener("click", () => { if (gameRunning && dx !== -box) { dx = box; dy = 0; }});
 
 // ==================== LEADERBOARD ====================
 let leaderboard = JSON.parse(localStorage.getItem('pornLeaderboard')) || [];
