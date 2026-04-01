@@ -259,21 +259,19 @@ Scores lagres offentlig • Skriv inn wallet-adresse etter game over
 </p>
 </div>
 
-<!-- ==================== NY SCRIPT DEL ==================== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ==================== SUPABASE CONFIG ====================
+// ==================== SUPABASE CONFIG (fikset) ====================
 const SUPABASE_URL = 'https://bbcyuqwxxrdtwptemolt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP';
 
 let supabaseClient;
 
 try {
-  const { createClient } = supabase;
+  const { createClient } = window.supabase || supabase;
   supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false },
-    global: { headers: { 'X-Client-Info': 'supabase-js-web' } }
+    auth: { persistSession: false }
   });
   console.log("✅ Supabase client initialized successfully");
 } catch (e) {
@@ -358,14 +356,14 @@ async function gameOver() {
   }
 }
 
-// ==================== SUPABASE FUNCTIONS WITH BETTER LOGGING ====================
+// ==================== SUPABASE FUNCTIONS (med bedre feilsøking) ====================
 async function saveScore(wallet, newScore) {
   if (!supabaseClient) {
     alert("Supabase ikke initialisert");
     return;
   }
 
-  console.log("🔄 Forsøker å lagre score:", { wallet, score: newScore });
+  console.log("🔄 Forsøker å lagre:", { wallet, score: newScore });
 
   try {
     const { data, error } = await supabaseClient
@@ -431,7 +429,6 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowDown" && dy !== -box) { dx = 0; dy = box; }
 });
 
-// Mobile buttons
 document.getElementById("up").addEventListener("click", () => { 
   if (gameRunning && dy !== box) { dx = 0; dy = -box; }
 });
