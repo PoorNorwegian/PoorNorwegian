@@ -24,190 +24,74 @@ background: var(--bg);
 line-height: 1.7;
 }
 
-h1, h2 {
-font-family: 'Space Grotesk', sans-serif;
-font-weight: 700;
-letter-spacing: -0.02em;
-}
+h1, h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
 
-/* TICKER */
-.ticker {
-background: #0a0f0c;
-padding: 14px 0;
-overflow: hidden;
-white-space: nowrap;
-border-bottom: 1px solid #1f2a24;
-}
-.ticker span {
-display: inline-block;
-padding-left: 100%;
-animation: scroll 25s linear infinite;
-font-size: 1.05em;
-color: var(--text-light);
-}
-@keyframes scroll {
-0% { transform: translateX(0); }
-100% { transform: translateX(-100%); }
-}
+/* TICKER, HERO, BUTTONS, SECTIONS – beholdes uendret (samme som før) */
+.ticker { background: #0a0f0c; padding: 14px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #1f2a24; }
+.ticker span { display: inline-block; padding-left: 100%; animation: scroll 25s linear infinite; font-size: 1.05em; color: var(--text-light); }
+@keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* HERO */
-.hero {
-height: 100vh;
-min-height: 650px;
-background: linear-gradient(rgba(10,15,12,0.85), rgba(10,15,12,0.92)),
-            url("banner.png") center/cover no-repeat;
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-}
-.hero-content h1 {
-font-size: 5.5rem;
-color: var(--accent);
-text-shadow: 0 0 40px rgba(0,196,140,0.4);
-margin: 0 0 16px 0;
-}
-.hero-content p {
-font-size: 1.6rem;
-max-width: 620px;
-margin: 0 auto 50px;
-color: var(--text-light);
-}
+.hero { height: 100vh; min-height: 650px; background: linear-gradient(rgba(10,15,12,0.85), rgba(10,15,12,0.92)), url("banner.png") center/cover no-repeat; display: flex; justify-content: center; align-items: center; position: relative; }
+.hero-content h1 { font-size: 5.5rem; color: var(--accent); text-shadow: 0 0 40px rgba(0,196,140,0.4); margin: 0 0 16px 0; }
+.hero-content p { font-size: 1.6rem; max-width: 620px; margin: 0 auto 50px; color: var(--text-light); }
 
-/* BUTTONS */
-.btn {
-background: var(--accent);
-color: #0a0f0c;
-padding: 16px 40px;
-margin: 12px;
-display: inline-block;
-font-weight: 600;
-font-size: 1.2rem;
-border-radius: 50px;
-text-decoration: none;
-transition: all 0.3s ease;
-box-shadow: 0 8px 25px rgba(0,196,140,0.3);
-}
-.btn:hover {
-transform: translateY(-4px);
-box-shadow: 0 12px 35px rgba(0,196,140,0.4);
-background: #00e6a3;
-}
+.btn { background: var(--accent); color: #0a0f0c; padding: 16px 40px; margin: 12px; display: inline-block; font-weight: 600; font-size: 1.2rem; border-radius: 50px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,196,140,0.3); }
+.btn:hover { transform: translateY(-4px); box-shadow: 0 12px 35px rgba(0,196,140,0.4); background: #00e6a3; }
 
-/* SECTIONS */
-.section {
-padding: 100px 20px;
-max-width: 1100px;
-margin: 0 auto;
-}
-h2 {
-font-size: 3.2rem;
-color: var(--accent);
-margin-bottom: 40px;
-text-align: center;
-}
+.section { padding: 100px 20px; max-width: 1100px; margin: 0 auto; }
+h2 { font-size: 3.2rem; color: var(--accent); margin-bottom: 40px; text-align: center; }
 
-.content-box {
-background: var(--card);
-border: 1px solid rgba(0,196,140,0.2);
-border-radius: 20px;
-padding: 50px 45px;
-max-width: 820px;
-margin: 0 auto;
-text-align: left;
-box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-.content-box p {
-font-size: 1.18rem;
-margin-bottom: 22px;
-}
+.content-box { background: var(--card); border: 1px solid rgba(0,196,140,0.2); border-radius: 20px; padding: 50px 45px; max-width: 820px; margin: 0 auto; text-align: left; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
 
 /* SNAKE GAME */
-#game-container {
-display: inline-block;
-position: relative;
-margin: 30px auto;
-}
-#game {
-background: #0a0f0c;
-border: 6px solid var(--accent);
-border-radius: 16px;
-box-shadow: 0 0 40px rgba(0,196,140,0.3);
-touch-action: none;
-}
+#game-container { display: inline-block; position: relative; margin: 30px auto; }
+#game { background: #0a0f0c; border: 6px solid var(--accent); border-radius: 16px; box-shadow: 0 0 40px rgba(0,196,140,0.3); touch-action: none; }
 
-/* Mobile controls */
+/* MOBILE CONTROLS – NÅ ALLTID SYNLIG PÅ MOBIL */
 .controls {
-display: none;
-grid-template-columns: repeat(3, 60px);
-gap: 10px;
+display: grid;
+grid-template-columns: repeat(3, 70px);
+gap: 12px;
 justify-content: center;
-margin: 20px auto;
+margin: 25px auto;
+}
+@media (min-width: 768px) {
+.controls { display: none; }
 }
 .controls button {
-background: rgba(0,196,140,0.2);
+background: rgba(0,196,140,0.25);
 color: var(--accent);
-border: 2px solid var(--accent);
-border-radius: 12px;
-font-size: 1.8rem;
-height: 60px;
-width: 60px;
+border: 3px solid var(--accent);
+border-radius: 16px;
+font-size: 2rem;
+height: 70px;
+width: 70px;
+font-weight: bold;
 }
 .controls button:active {
 background: var(--accent);
 color: #0a0f0c;
+transform: scale(0.95);
 }
 
 /* LEADERBOARD */
-#leaderboard {
-background: var(--card);
-border: 1px solid rgba(0,196,140,0.2);
-border-radius: 20px;
-padding: 50px 40px;
-max-width: 900px;
-margin: 60px auto;
-}
-#leaderboard table {
-width: 100%;
-border-collapse: collapse;
-background: #0a0f0c;
-border-radius: 12px;
-overflow: hidden;
-}
-#leaderboard th, #leaderboard td {
-padding: 18px 25px;
-text-align: left;
-}
-#leaderboard th {
-background: var(--accent);
-color: #0a0f0c;
-font-weight: 700;
-}
-#leaderboard td:first-child {
-text-align: center;
-font-weight: 600;
-color: var(--accent);
-}
-.highlight {
-background: rgba(0,196,140,0.1);
-}
+#leaderboard { background: var(--card); border: 1px solid rgba(0,196,140,0.2); border-radius: 20px; padding: 50px 40px; max-width: 900px; margin: 60px auto; }
+#leaderboard table { width: 100%; border-collapse: collapse; background: #0a0f0c; border-radius: 12px; overflow: hidden; }
+#leaderboard th, #leaderboard td { padding: 18px 25px; text-align: left; }
+#leaderboard th { background: var(--accent); color: #0a0f0c; font-weight: 700; }
+#leaderboard td:first-child { text-align: center; font-weight: 600; color: var(--accent); }
+.highlight { background: rgba(0,196,140,0.1); }
 
-#loading {
-text-align: center;
-padding: 30px;
-font-style: italic;
-color: var(--text-light);
-}
+#loading { text-align: center; padding: 30px; font-style: italic; color: var(--text-light); }
 </style>
 </head>
 <body>
 
-<!-- TICKER -->
+<!-- TICKER + HERO + INFO – beholdes uendret (kopier fra forrige versjon hvis du vil) -->
 <div class="ticker">
 <span>🚀 From high taxes to high hopes • 🇳🇴 PoorNorwegian (PORN) • 💰 Community-driven • 🐍 Snake leaderboard live • 🔥 Degens & Norwegians unite</span>
 </div>
 
-<!-- HERO -->
 <div class="hero">
 <div class="hero-content" style="text-align:center;">
 <h1>PoorNorwegian</h1>
@@ -217,7 +101,6 @@ color: var(--text-light);
 </div>
 </div>
 
-<!-- INFO SECTION -->
 <div class="section" id="info">
 <h2>ℹ️ Info</h2>
 <div class="content-box">
@@ -244,7 +127,7 @@ color: var(--text-light);
 <button id="right">→</button>
 </div>
 
-<p style="margin:20px 0 10px; font-size:1.2rem;">
+<p style="margin:20px 0 10px; font-size:1.2rem; text-align:center;">
 Score: <span id="score">0</span> &nbsp;&nbsp;&nbsp;
 High Score: <span id="highscore">0</span>
 </p>
@@ -257,11 +140,7 @@ High Score: <span id="highscore">0</span>
 <div id="loading">Laster leaderboard fra Supabase...</div>
 <table id="lbTable" style="display:none;">
 <thead>
-<tr>
-<th>Rank</th>
-<th>Wallet / Signature</th>
-<th>Score</th>
-</tr>
+<tr><th>Rank</th><th>Wallet / Signature</th><th>Score</th></tr>
 </thead>
 <tbody id="lbBody"></tbody>
 </table>
@@ -270,19 +149,18 @@ Scores lagres offentlig • Skriv inn wallet-adresse etter game over
 </p>
 </div>
 
-<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ==================== SUPABASE KONFIGURASJON ====================
+// ==================== SUPABASE ====================
 const SUPABASE_URL = 'https://bbcyuqwxxrdtwptemolt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP';
 
 let supabaseClient;
 try {
-  const { createClient } = supabase;   // Global variabel fra CDN
+  const { createClient } = supabase;
   supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log("✅ Supabase client initialized");
+  console.log("✅ Supabase initialized successfully");
 } catch (e) {
   console.error("❌ Supabase initialization failed", e);
 }
@@ -291,26 +169,14 @@ try {
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const box = 25;
-let cols = canvas.width / box;
-let rows = canvas.height / box;
-
-let snake = [];
-let food = {};
-let dx = box;
-let dy = 0;
-let score = 0;
+let snake = [], food = {}, dx = box, dy = 0, score = 0;
 let gameInterval = null;
 let gameRunning = false;
 
 function initGame() {
   snake = [{ x: 10 * box, y: 10 * box }];
-  food = { 
-    x: Math.floor(Math.random() * (cols - 2) + 1) * box, 
-    y: Math.floor(Math.random() * (rows - 2) + 1) * box 
-  };
-  dx = box; 
-  dy = 0; 
-  score = 0;
+  food = { x: Math.floor(Math.random() * 22 + 1) * box, y: Math.floor(Math.random() * 22 + 1) * box };
+  dx = box; dy = 0; score = 0;
   document.getElementById("score").textContent = score;
   gameRunning = true;
 }
@@ -319,12 +185,12 @@ function draw() {
   ctx.fillStyle = "#0a0f0c";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < snake.length; i++) {
-    ctx.fillStyle = (i === 0) ? "#00c48c" : "#00a675";
-    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+  snake.forEach((s, i) => {
+    ctx.fillStyle = i === 0 ? "#00c48c" : "#00a675";
+    ctx.fillRect(s.x, s.y, box, box);
     ctx.strokeStyle = "#0a0f0c";
-    ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-  }
+    ctx.strokeRect(s.x, s.y, box, box);
+  });
 
   ctx.fillStyle = "#d4af37";
   ctx.fillRect(food.x, food.y, box, box);
@@ -336,10 +202,8 @@ function draw() {
 
 function move() {
   if (!gameRunning) return;
-
   const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-  // Kollisjon med vegg eller seg selv
   if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
       snake.some(s => s.x === head.x && s.y === head.y)) {
     gameOver();
@@ -347,23 +211,16 @@ function move() {
   }
 
   snake.unshift(head);
-
   if (head.x === food.x && head.y === food.y) {
     score += 10;
     document.getElementById("score").textContent = score;
-    food = { 
-      x: Math.floor(Math.random() * (cols - 2) + 1) * box, 
-      y: Math.floor(Math.random() * (rows - 2) + 1) * box 
-    };
+    food = { x: Math.floor(Math.random() * 22 + 1) * box, y: Math.floor(Math.random() * 22 + 1) * box };
   } else {
     snake.pop();
   }
 }
 
-function gameLoop() {
-  move();
-  draw();
-}
+function gameLoop() { move(); draw(); }
 
 function startGame() {
   if (gameInterval) clearInterval(gameInterval);
@@ -374,33 +231,43 @@ function startGame() {
 
 async function gameOver() {
   gameRunning = false;
-  if (gameInterval) clearInterval(gameInterval);
+  clearInterval(gameInterval);
 
-  const currentHigh = parseInt(localStorage.getItem("highscore") || "0");
-  if (score > currentHigh) {
-    localStorage.setItem("highscore", score);
-  }
+  const high = parseInt(localStorage.getItem("highscore") || "0");
+  if (score > high) localStorage.setItem("highscore", score);
   document.getElementById("highscore").textContent = localStorage.getItem("highscore") || 0;
 
   const wallet = prompt(`Game Over!\n\nDu scoret ${score} poeng!\n\nSkriv inn wallet-adresse eller signatur:`);
-  if (wallet && wallet.trim() && supabaseClient) {
+  if (wallet && wallet.trim()) {
     await saveScore(wallet.trim(), score);
-  } else if (!supabaseClient) {
-    alert("Supabase er ikke tilkoblet – scoren lagres ikke.");
   }
-
-  alert(`Game Over! Du scoret ${score} poeng 🐍`);
 }
 
-// ==================== SUPABASE LEADERBOARD ====================
+// ==================== SAVE & LOAD ====================
+async function saveScore(wallet, newScore) {
+  if (!supabaseClient) {
+    alert("Supabase er ikke tilkoblet.");
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('leaderboard')
+      .insert([{ wallet: wallet, score: newScore }]);
+
+    if (error) throw error;
+
+    console.log("✅ Score lagret");
+    await loadLeaderboard();
+  } catch (err) {
+    console.error("Save error details:", err);
+    alert("Kunne ikke lagre scoren.\n\nFeilmelding: " + (err.message || err));
+  }
+}
+
 async function loadLeaderboard() {
   const loadingEl = document.getElementById("loading");
   const tableEl = document.getElementById("lbTable");
-
-  if (!supabaseClient) {
-    loadingEl.textContent = "Supabase er ikke initialisert. Sjekk konsollen.";
-    return;
-  }
 
   try {
     const { data, error } = await supabaseClient
@@ -418,43 +285,22 @@ async function loadLeaderboard() {
       data.forEach((entry, i) => {
         const row = document.createElement('tr');
         if (i < 3) row.classList.add('highlight');
-        row.innerHTML = `
-          <td>${i+1}</td>
-          <td style="font-family:monospace; word-break:break-all;">${entry.wallet}</td>
-          <td style="text-align:center; font-weight:600; color:var(--accent);">${entry.score}</td>
-        `;
+        row.innerHTML = `<td>${i+1}</td><td style="font-family:monospace; word-break:break-all;">${entry.wallet}</td><td style="text-align:center; font-weight:600; color:var(--accent);">${entry.score}</td>`;
         tbody.appendChild(row);
       });
     } else {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:40px;">Ingen scores ennå — spill og legg til din wallet!</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:40px;">Ingen scores ennå – vær den første!</td></tr>`;
     }
 
     loadingEl.style.display = "none";
     tableEl.style.display = "table";
   } catch (err) {
-    console.error("Leaderboard error:", err);
-    loadingEl.textContent = "Kunne ikke laste leaderboard. Sjekk konsollen for detaljer.";
+    console.error("Load leaderboard error:", err);
+    loadingEl.textContent = "Kunne ikke laste leaderboard. Sjekk konsollen (F12).";
   }
 }
 
-async function saveScore(wallet, newScore) {
-  if (!supabaseClient) return;
-
-  try {
-    const { error } = await supabaseClient
-      .from('leaderboard')
-      .insert([{ wallet: wallet, score: newScore }]);
-
-    if (error) throw error;
-    console.log("✅ Score saved");
-    await loadLeaderboard(); // Oppdater listen
-  } catch (err) {
-    console.error("Save score error:", err);
-    alert("Kunne ikke lagre scoren. Sjekk internett-tilkobling.");
-  }
-}
-
-// Keyboard controls
+// Controls
 document.addEventListener("keydown", e => {
   if (!gameRunning) return;
   if (e.key === "ArrowLeft" && dx !== box) { dx = -box; dy = 0; }
@@ -463,24 +309,14 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowDown" && dy !== -box) { dx = 0; dy = box; }
 });
 
-// Mobile buttons
-document.getElementById("up").addEventListener("click", () => { 
-  if (gameRunning && dy !== box) { dx = 0; dy = -box; }
-});
-document.getElementById("down").addEventListener("click", () => { 
-  if (gameRunning && dy !== -box) { dx = 0; dy = box; }
-});
-document.getElementById("left").addEventListener("click", () => { 
-  if (gameRunning && dx !== box) { dx = -box; dy = 0; }
-});
-document.getElementById("right").addEventListener("click", () => { 
-  if (gameRunning && dx !== -box) { dx = box; dy = 0; }
-});
+document.getElementById("up").addEventListener("click", () => { if (gameRunning && dy !== box) { dx = 0; dy = -box; }});
+document.getElementById("down").addEventListener("click", () => { if (gameRunning && dy !== -box) { dx = 0; dy = box; }});
+document.getElementById("left").addEventListener("click", () => { if (gameRunning && dx !== box) { dx = -box; dy = 0; }});
+document.getElementById("right").addEventListener("click", () => { if (gameRunning && dx !== -box) { dx = box; dy = 0; }});
 
-// Start
+// Init
 document.getElementById("highscore").textContent = localStorage.getItem("highscore") || 0;
 loadLeaderboard();
-
 </script>
 </body>
 </html>
