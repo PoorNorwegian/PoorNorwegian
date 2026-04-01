@@ -43,7 +43,7 @@ color: var(--text-light);
 }
 @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* HERO - uten banner.png */
+/* HERO */
 .hero {
 height: 100vh;
 min-height: 650px;
@@ -123,7 +123,7 @@ box-shadow: 0 0 40px rgba(0,196,140,0.3);
 touch-action: none;
 }
 
-/* MOBILE CONTROLS - Bedre for touch */
+/* MOBILE CONTROLS */
 .controls {
 display: grid;
 grid-template-columns: repeat(3, 78px);
@@ -131,7 +131,6 @@ gap: 14px;
 justify-content: center;
 margin: 25px auto 10px;
 z-index: 10;
-pointer-events: auto;
 }
 @media (min-width: 768px) {
 .controls { display: none; }
@@ -260,18 +259,23 @@ Scores lagres offentlig • Skriv inn wallet-adresse etter game over
 </p>
 </div>
 
+<!-- ==================== NY SCRIPT DEL ==================== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ==================== SUPABASE ====================
+// ==================== SUPABASE CONFIG ====================
 const SUPABASE_URL = 'https://bbcyuqwxxrdtwptemolt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_2EWFcmDjlO7Y3BPLXDnzEw_gUwWSEzP';
 
 let supabaseClient;
+
 try {
   const { createClient } = supabase;
-  supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log("✅ Supabase client initialized");
+  supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false },
+    global: { headers: { 'X-Client-Info': 'supabase-js-web' } }
+  });
+  console.log("✅ Supabase client initialized successfully");
 } catch (e) {
   console.error("❌ Supabase initialization failed", e);
 }
@@ -354,26 +358,28 @@ async function gameOver() {
   }
 }
 
-// ==================== SUPABASE FUNCTIONS ====================
+// ==================== SUPABASE FUNCTIONS WITH BETTER LOGGING ====================
 async function saveScore(wallet, newScore) {
   if (!supabaseClient) {
-    alert("Supabase er ikke tilkoblet.");
+    alert("Supabase ikke initialisert");
     return;
   }
 
+  console.log("🔄 Forsøker å lagre score:", { wallet, score: newScore });
+
   try {
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('leaderboard')
-      .insert([{ wallet: wallet, score: newScore }], { returning: 'minimal' });
+      .insert([{ wallet: wallet, score: newScore }]);
 
     if (error) throw error;
 
-    console.log("✅ Score lagret successfully");
+    console.log("✅ Score lagret!", data);
+    alert("Score lagret til leaderboard! ✅");
     await loadLeaderboard();
-    alert("Score lagret til leaderboard!");
   } catch (err) {
-    console.error("Save error:", err);
-    alert("Kunne ikke lagre scoren.\nFeil: " + (err.message || JSON.stringify(err)));
+    console.error("💥 Save error details:", err);
+    alert(`Kunne ikke lagre scoren.\nFeil: ${err.message || err}`);
   }
 }
 
@@ -397,7 +403,11 @@ async function loadLeaderboard() {
       data.forEach((entry, i) => {
         const row = document.createElement('tr');
         if (i < 3) row.classList.add('highlight');
-        row.innerHTML = `<td>${i+1}</td><td style="font-family:monospace; word-break:break-all;">${entry.wallet}</td><td style="text-align:center; font-weight:600; color:var(--accent);">${entry.score}</td>`;
+        row.innerHTML = `
+          <td>${i+1}</td>
+          <td style="font-family:monospace; word-break:break-all;">${entry.wallet}</td>
+          <td style="text-align:center; font-weight:600; color:var(--accent);">${entry.score}</td>
+        `;
         tbody.appendChild(row);
       });
     } else {
@@ -408,11 +418,11 @@ async function loadLeaderboard() {
     tableEl.style.display = "table";
   } catch (err) {
     console.error("Load leaderboard error:", err);
-    loadingEl.textContent = "Kunne ikke laste leaderboard (sjekk konsollen F12).";
+    loadingEl.textContent = "Kunne ikke laste leaderboard – sjekk konsollen (F12)";
   }
 }
 
-// Keyboard
+// ==================== CONTROLS ====================
 document.addEventListener("keydown", e => {
   if (!gameRunning) return;
   if (e.key === "ArrowLeft" && dx !== box) { dx = -box; dy = 0; }
@@ -422,10 +432,18 @@ document.addEventListener("keydown", e => {
 });
 
 // Mobile buttons
-document.getElementById("up").addEventListener("click", () => { if (gameRunning && dy !== box) { dx = 0; dy = -box; }});
-document.getElementById("down").addEventListener("click", () => { if (gameRunning && dy !== -box) { dx = 0; dy = box; }});
-document.getElementById("left").addEventListener("click", () => { if (gameRunning && dx !== box) { dx = -box; dy = 0; }});
-document.getElementById("right").addEventListener("click", () => { if (gameRunning && dx !== -box) { dx = box; dy = 0; }});
+document.getElementById("up").addEventListener("click", () => { 
+  if (gameRunning && dy !== box) { dx = 0; dy = -box; }
+});
+document.getElementById("down").addEventListener("click", () => { 
+  if (gameRunning && dy !== -box) { dx = 0; dy = box; }
+});
+document.getElementById("left").addEventListener("click", () => { 
+  if (gameRunning && dx !== box) { dx = -box; dy = 0; }
+});
+document.getElementById("right").addEventListener("click", () => { 
+  if (gameRunning && dx !== -box) { dx = box; dy = 0; }
+});
 
 // Init
 document.getElementById("highscore").textContent = localStorage.getItem("highscore") || 0;
